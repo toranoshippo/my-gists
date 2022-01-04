@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script>
+// config-XMTrading-micro-account
+const TRADING_VOLUME = 1000
+const MIN_LOT_SIZE   = 0.01
+// config-common
+const JPY            = 0.01
+const OTHER          = 0.001
+
+const EMPTY_CODE     = 0
+const STRING_CODE    = 999
+
+let symbol               // 通貨ペア
+let pair_yen_rate        // 為替レート
+let loss_potential_amount// 最大許容損失額
+let entry_price          // エントリー価格
+let loss_cut_price       // ロスカット価格
+
+const calc_pips = () => {
+  // 小数点以下の桁数を取得
+  const num = String(entry_price).split('.')[1]
+  const decimal_point_length = num ? num.length : 0
+
+  let tmp = '1'
+  for(let i = 0; i < decimal_point_length; i++) {
+    tmp += '0'
+  }
+  const decimal_point = Number(tmp)
+
+  return Math.abs((entry_price * decimal_point) - (loss_cut_price * decimal_point))
+}
+const lambda_calc_optimal_lots = () => {
+  const pips = calc_pips()
+  console.log(pips + 'pips')
+  let adjust = pips * JPY
+
+  if (symbol.slice(-3) !== 'JPY') {
+    loss_potential_amount = loss_potential_amount / pair_yen_rate
+    adjust *= OTHER;
+  }
+
+  const recommended_lot_size = Math.floor(
+                                 (loss_potential_amount / adjust / TRADING_VOLUME) / MIN_LOT_SIZE
+                               ) * MIN_LOT_SIZE
+  console.log(recommended_lot_size)
+}
+
+const to_number = data => {
+  if (data === '')                  return EMPTY_CODE
+  // データ型チェック’数字のみ’stringの場合はNanになる
+  if (isNaN((data = Number(data)))) return STRING_CODE
+  
+  return data
+}
+const check_data = data => {
+  if (data === EMPTY_CODE)       return '未入力'
+  else if (data === STRING_CODE) return 'string'
+
+  return ''
+}
+
+const check_data_info = () => {
+  let bool = true
+  let msg
+
+  if (symbol === '通貨ペアを選択してください'){
+    console.log('通貨ペアを選択してください')
+    bool = false
+  }
+
+  if ((msg = check_data(pair_yen_rate)) !== '') {
+    console.log('pair_yen_rate ' + msg)
+    bool = false
+  }
+
+  if ((msg = check_data(loss_potential_amount)) !== '') {
+    console.log('loss_potential_amount ' + msg)
+    bool = false
+  }
+
+  if ((msg = check_data(entry_price)) !== '') {
+    console.log('entry_price ' + msg)
+    bool = false
+  }
+
+  if ((msg = check_data(loss_cut_price)) !== '') {
+    console.log('loss_cut_price ' + msg)
+    bool = false
+  }
+
+  return bool
+}
+
+const main = () => {
+  symbol = document.getElementById('symbol').value
+
+  pair_yen_rate         = to_number(document.getElementById('pair_yen_rate').value)
+  loss_potential_amount = to_number(document.getElementById('loss_potential_amount').value)
+  entry_price           = to_number(document.getElementById('entry_price').value)
+  loss_cut_price        = to_number(document.getElementById('loss_cut_price').value)
+
+  if (!check_data_info()) return
+  // TODO
+  lambda_calc_optimal_lots()
+}
+</script>
+</head>
+  <body>
+    <table align="center">
+      <tr>
+        <td align="right"><b>通貨ペア：</b></td>
+        <td>
+          <select name="symbol" id="symbol">
+            <option disabled selected>通貨ペアを選択してください</option>
+            <option value="USDJPY">USDJPY</option>
+            <option value="EURUSD">EURUSD</option>
+            <option value="EURJPY">EURJPY</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td align="right"><b>為替レート：</b></td>
+        <td><input type="text" id="pair_yen_rate" />/円</td>
+      </tr>
+      <tr>
+        <td align="right"><b>最大許容損失額：</b></td>
+        <td><input type="text" id="loss_potential_amount" /></td>
+      </tr>
+      <tr>
+        <td align="right"><b>エントリー価格：</b></td>
+        <td><input type="text" id="entry_price" /></td>
+      </tr>
+      <tr>
+        <td align="right"><b>ロスカット価格：</b></td>
+        <td><input type="text" id="loss_cut_price" /></td>
+      </tr>
+      <tr>
+        <td>
+          <button type="button" onclick="main()">
+            <font color="#333399">推奨ロットサイズを計算</font>
+          </button>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
