@@ -1,0 +1,82 @@
+/**
+ * Calculate the mean
+ *
+ * @param {Array} data - x_data of y_data
+ * @return {Number}
+ */
+const get_avg = data => {
+  return data.reduce((prev, v) => prev + v) / data.length
+}
+
+/**
+ * Calculate the Deviation
+ *
+ * @param {Array} data - x_data of y_data
+ * @return {Array}
+ */
+const get_deviation = data => {
+  const avg = get_avg(data)
+  return data.map(v => v - avg)
+}
+
+/**
+ * Calculate the Standard deviation
+ *
+ * @param {Array} data - x_data of y_data
+ * @return {Array}
+ */
+const get_variance = data => {
+  const avg = get_avg(data)
+
+  let sum = 0
+  for (const ele of data) {
+    sum += (ele - avg) ** 2
+  }
+  return Math.sqrt(sum / data.length)
+}
+
+/**
+ * Calculate the Covariance
+ *
+ * @param {Array} x - x_data
+ * @param {Array} y - y_data
+ * @return {Number}
+ */
+const get_covariance = (x, y) => {
+  verify_xy_length(x, y)
+
+  const x_avg = get_avg(x)
+  const y_avg = get_avg(y)
+
+  let sum = 0
+  for (let i = 0; i < x.length; i++) {
+    sum += (x[i] - x_avg) * (y[i] - y_avg)
+  }
+  return sum / x.length
+}
+
+/**
+ * Calculate the Correlation coefficient
+ *
+ * @param {Array} x - x_data
+ * @param {Array} y - y_data
+ * @return {Number}
+ */
+const get_correlation_coefficient = (x, y) => {
+  return get_covariance(x, y) / (get_variance(x) * get_variance(y))
+}
+
+/**
+ * If the number of arrays does not match, terminate the process
+ *
+ * @param {Array} x - x_data
+ * @param {Array} y - y_data
+ * @return {undefined}
+ */
+const verify_xy_length = (x, y) => {
+  try {
+    if (x.length !== y.length) throw new RangeError()
+  } catch (e) {
+    Error.log(e.message)
+  }
+}
