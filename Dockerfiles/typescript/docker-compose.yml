@@ -1,0 +1,11 @@
+version: "3"
+services:
+  ts-app:
+    build: .
+    image: ts-src
+    tty: true
+    restart: always
+    ports:
+      - "8000:3000"
+    volumes:
+      - ./src:/root
