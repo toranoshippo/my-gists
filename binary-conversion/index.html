@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script>
+const BINARY_HEX_PAIR_LIST = {
+  '0000': '0',
+  '0001': '1',
+  '0010': '2',
+  '0011': '3',
+  '0100': '4',
+  '0101': '5',
+  '0110': '6',
+  '0111': '7',
+  '1000': '8',
+  '1001': '9',
+  '1010': 'A',
+  '1011': 'B',
+  '1100': 'C',
+  '1101': 'D',
+  '1110': 'E',
+  '1111': 'F'
+}
+
+const to_decimal = () => {
+  const input_binary = document.getElementById('input_data').value
+  let cnt = result = 0
+  input_binary.split("").reverse().forEach(v => {
+    if (parseInt(v) === 1) result += 2 ** cnt
+    cnt++
+  })
+  alert(result)
+}
+
+const to_hex = () => {
+  const input_binary = document.getElementById('input_data').value
+  divide_num = input_binary.length / 4
+  if (divide_num !== 0) {
+    let num1 = 0
+    let result = ''
+    while (divide_num > 0) {
+      let b = input_binary.substr(num1, 4)
+      result += BINARY_HEX_PAIR_LIST[b]
+      num1 += 4
+      divide_num--
+    }
+    alert(result)
+  } else {
+    alert('4の倍数で入力してください。')
+  }
+}
+</script>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <td size="5" align="right"><b> 2進数を入力してください：</b></td>
+        <td><input type="text" id="input_data" size="6"</td>
+      </tr>
+    <tr>
+      <td><button type="button" onclick="to_decimal()">
+      <font size="5" color="#333399">10進数に変換する</font>
+      </button></td>
+    <td><button type="button" onclick="to_hex()">
+      <font size="5" color="#333399">16進数に変換する</font></td>
+    </button>
+    </tr>
+</table>
+</body>
+</html>
