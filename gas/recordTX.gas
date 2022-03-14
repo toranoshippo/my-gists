@@ -1,0 +1,55 @@
+// @ts-nocheck
+//https://masa-enjoy.com/gas-dateobject-timezone
+// 時間設定するときに時間がずれるから上見て対応
+
+const mailAddress = 'taigamiura22@gmail.com'
+
+const extractData = () => {
+  let messagesForThreads = getMessagesForThreads()
+  let result = []
+  for (let i = 0; i < messagesForThreads.length; i++) {
+    for (let j = 0; j < messagesForThreads[i].length; j++) {
+      let data = messagesForThreads[i][j].getPlainBody().split(/\r\n|\n/)
+      let tmp = []
+      for (let k = 0; k < data.length; k++) {
+        if (
+          data[k].indexOf('通貨ペア : ') !== -1
+          || data[k].indexOf('売買　　 : ') !== -1
+          || data[k].indexOf('約定数量 : ') !== -1
+          || data[k].indexOf('約定日時 : ') !== -1
+        ) {
+          console.log(data[k])
+          tmp.push(data[k])
+        } else if (data[k].indexOf('詳細については、') !== -1) {
+          break
+        }
+      }
+    }
+    console.log('*****************')
+  }
+  console.log(result)
+  return result
+}
+const getMessagesForThreads = () => {
+  const now = new Date()
+  const today = now.getFullYear() + '/' + (now.getMonth()+1)  + '/'+ now.getDate()
+  
+  now.setDate(now.getDate() - 1)
+  const yesterday = now.getFullYear() + '/' + (now.getMonth()+1)  + '/'+ now.getDate()
+
+  const mailSubject = 'subject:約定のお知らせ（SBI FXトレード株式会社）'
+  const mailTime    = 'after:' + yesterday + ' before:' + today
+  const query = mailSubject + ' ' + mailTime
+  const threads = GmailApp.search(query, 0, 10)
+  return GmailApp.getMessagesForThreads(threads)
+}
+
+function setTrigger() {
+  const setTime = new Date();
+  const dayOfWeek = setTime.getDay()
+  if (dayOfWeek !== 0 || dayOfWeek !== 6) {
+    setTime.setHours(7);
+    setTime.setMinutes(35); 
+    ScriptApp.newTrigger('registCalenderEvent').timeBased().at(setTime).create()
+  }
+}
