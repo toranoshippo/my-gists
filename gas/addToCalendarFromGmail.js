@@ -1,10 +1,10 @@
 //https://masa-enjoy.com/gas-dateobject-timezone
 // 時間設定するときに時間がずれるから上見て対応
 
-const mailAddress = 'taigamiura22@gmail.com'
+const MAIL_ADDRESS = 'taigamiura22@gmail.com'
 
 function registCalenderEvent() {
-  const myCalendar = CalendarApp.getCalendarById(mailAddress)
+  const myCalendar = CalendarApp.getCalendarById(MAIL_ADDRESS)
 
   const gii = getImportantIndicator()
   for (let i = 0; i < gii.length; i++) {
@@ -26,9 +26,9 @@ const getEventData = (gii, firstIndex) => {
 
   const now = new Date()
   const startDate = new Date(
-    now.getFullYear() + '/' +
+    now.getFullYear()  + '/' +
     (now.getMonth()+1) + '/' +
-    now.getDate() + ' ' +
+    now.getDate()      + ' ' +
     t[0] + ':' + t[1]
   )
   return {
@@ -39,7 +39,7 @@ const getEventData = (gii, firstIndex) => {
   }
 }
 
-// 取得したGmailの中から重要度Lv1以上をピックアップ
+// メール本文から重要度Lv1(☆)以上をピックアップ
 const getImportantIndicator = () => {
   // 重要度Lv1以上をピックアップ
   const list = (body => {
@@ -75,7 +75,6 @@ const getGmail = () => {
   yesterday = now.getFullYear() + '/' + (now.getMonth()+1)  + '/'+ now.getDate()
   const mailSubject = 'subject:本日の経済指標予定【マネーパートナーズ】'
   const yyyymmdd = now.getFullYear() + '/' + (now.getMonth()+1)  + '/'+ now.getDate()
-  // const mailTime    = 'after:' + yyyymmdd// + ' before:' + yyyymmdd
   const query = mailSubject + ' after:' + yyyymmdd
   const threads = GmailApp.search(query, 0, 1)
   const messagesForThreads = GmailApp.getMessagesForThreads(threads)
@@ -85,6 +84,7 @@ const getGmail = () => {
 function setTrigger() {
   const setTime = new Date();
   const dayOfWeek = setTime.getDay()
+  // 平日7:35
   if (dayOfWeek !== 0 || dayOfWeek !== 6) {
     setTime.setHours(7);
     setTime.setMinutes(35); 
